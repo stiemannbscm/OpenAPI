@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
 from uuid import uuid4
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 todo_lists = {}
 todo_entries = {}
