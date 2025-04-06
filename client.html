@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Todo Listen</title>
+  <style>
+    body { font-family: sans-serif; margin: 2em; }
+    input, button { padding: 0.5em; margin: 0.5em 0; }
+    .entry { margin-left: 1em; }
+  </style>
+</head>
+<body>
+  <h1>Todo Listen</h1>
+  <h2>Neue Liste erstellen</h2>
+  <input type="text" id="listName" placeholder="Listenname"/>
+  <button onclick="createList()">Erstellen</button>
+  <div id="lists"></div>
+  <script>
+    const api = "http://127.0.0.1:5000";
+
+    async function createList() {
+      const name = document.getElementById("listName").value;
+      if (!name) return alert("Bitte Listenname eingeben!");
+
+      const res = await fetch(`${api}/todo-list`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(`Liste erstellt: ${data.name}`);
+        loadLists();
+      } else {
+        alert("Fehler: " + JSON.stringify(data));
+      }
+    }
+
+    async function loadLists() {
+      const res = await fetch(`${api}/todo-lists`);
+      const lists = await res.json();
+
+      const div = document.getElementById("lists");
+      div.innerHTML = "<h2>Vorhandene Listen</h2>";
+
+      for (const list of lists) {
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = `
+          <strong>${list.name}</strong> (ID: ${list.id})
+          <button onclick="deleteList('${list.id}')">Löschen</button>
+          <div class="entry" id="entries-${list.id}"></div>
+          <input class="entry" type="text" placeholder="Neuer Eintrag" id="entry-${list.id}">
+          <button onclick="addEntry('${list.id}')">➕</button>
+        `;
+        div.appendChild(wrapper);
+        loadEntries(list.id);
+      }
+    }
+
+    async function loadEntries(listId) {
+      const res = await fetch(`${api}/todo-list/${listId}/entries`);
+      const entries = await res.json();
+
+      const container = document.getElementById(`entries-${listId}`);
+      container.innerHTML = entries.map(e =>
+        `<div>${e.name} <button onclick="deleteEntry('${listId}', '${e.id}')">🗑️</button></div>`
+      ).join("");
+    }
+
+    async function addEntry(listId) {
+      const input = document.getElementById(`entry-${listId}`);
+      const name = input.value;
+      if (!name) return;
+
+      const res = await fetch(`${api}/todo-list/${listId}/entry`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name })
+      });
+
+      if (res.ok) {
+        input.value = "";
+        loadEntries(listId);
+      } else {
+        alert("Fehler beim Hinzufügen.");
+      }
+    }
+
+    async function deleteEntry(listId, entryId) {
+      await fetch(`${api}/todo-list/${listId}/entry/${entryId}`, { method: "DELETE" });
+      loadEntries(listId);
+    }
+
+    async function deleteList(listId) {
+      await fetch(`${api}/todo-list/${listId}`, { method: "DELETE" });
+      loadLists();
+    }
+
+    loadLists();
+  </script>
+</body>
+</html>
