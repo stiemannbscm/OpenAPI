@@ -18,3 +18,9 @@ Dies ist eine einfache REST-API zur Verwaltung von Todo-Listen und deren Einträ
 Installation der Pakete:
 ```bash
 pip install flask flask-cors pytest
+```
+
+Testen der API:
+```bash
+pytest -s test_server.py
+```
