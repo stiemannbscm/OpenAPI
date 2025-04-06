@@ -16,7 +16,7 @@
   <button onclick="createList()">Erstellen</button>
   <div id="lists"></div>
   <script>
-    const api = "http://127.0.0.1:5000";
+    const api = "https://todo-list-api-ucec.onrender.com/";
 
     async function createList() {
       const name = document.getElementById("listName").value;
@@ -30,7 +30,6 @@
 
       const data = await res.json();
       if (res.ok) {
-        alert(`Liste erstellt: ${data.name}`);
         loadLists();
       } else {
         alert("Fehler: " + JSON.stringify(data));
