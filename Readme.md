@@ -24,3 +24,7 @@ Testen der API:
 ```bash
 pytest -s test_server.py
 ```
+
+Edit:
+[simple Frontend]([https://example.com](https://stiemannbscm.github.io/OpenAPI/client.html))
+Nach hinzufügen einer Liste dauert es ein wenig bis die Liste erstellt wird, da Render das Projekt pausiert wenn es zu lange inaktiv ist. Es gibt keine User, deswegen werden alle die den Link haben alle listen sehen können.
